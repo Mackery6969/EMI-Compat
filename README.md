@@ -70,18 +70,3 @@ CI builds every entry in `supported_versions`, and a release publishes one jar p
 The logo is based on [EMI](https://github.com/emilyploszaj/emi)'s icon by Emi, used under the MIT License
 (see `src/main/resources/LICENSE_emi`). This is an unofficial addon and isn't affiliated with EMI.
 The 32×32 source is in `art/icon-32.png`.
-
-## Releasing
-
-Run the **Release** workflow from the Actions tab. It builds every supported target and publishes each jar to GitHub
-Releases, CurseForge and Modrinth. The changelog comes from the matching section of `CHANGELOG.md` unless you enter one
-in the workflow form.
-
-The workflow needs these repository settings:
-
-| Name                    | Kind     | Value                       |
-|-------------------------|----------|-----------------------------|
-| `CURSEFORGE_PROJECT_ID` | Variable | CurseForge project ID       |
-| `MODRINTH_PROJECT_ID`   | Variable | Modrinth project ID or slug |
-| `CURSEFORGE_TOKEN`      | Secret   | CurseForge API token        |
-| `MODRINTH_TOKEN`        | Secret   | Modrinth personal token     |
