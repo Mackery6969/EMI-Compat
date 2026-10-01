@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "mackery.emicompat.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "mackery.emicompat.mixin.EmiCompatMixinPlugin",
+  "mixins": [],
+  "client": [
+    "sophisticated.EmiScreenManagerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

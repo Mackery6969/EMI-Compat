@@ -1,0 +1,11 @@
+{
+  "emicompat.configuration.title": "EMI Compat Configs",
+  "emicompat.configuration.section.emicompat.client.toml": "EMI Compat Configs",
+  "emicompat.configuration.section.emicompat.client.toml.title": "EMI Compat Configs",
+  "emicompat.configuration.sophisticated": "Sophisticated Backpacks & Storage",
+  "emicompat.configuration.sophisticated.tooltip": "Only used when Sophisticated Core is installed.",
+  "emicompat.configuration.sophisticated.highlightStorageSlots": "Highlight Storage Slots",
+  "emicompat.configuration.sophisticated.highlightStorageSlots.tooltip": "Highlight backpack and storage slots holding items an EMI recipe tree still needs.",
+  "emicompat.configuration.sophisticated.skipHiddenSlots": "Skip Hidden Slots",
+  "emicompat.configuration.sophisticated.skipHiddenSlots.tooltip": "Don't draw EMI slot overlays on storage slots that are scrolled out of view or hidden by the search box."
+}

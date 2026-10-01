@@ -1,0 +1,10 @@
+{
+  "homepage": "https://github.com/Mackery6969/EMI-Compat",
+  "1.21.1": {
+    "1.0.0": "Initial release. EMI recipe tree highlights now work in Sophisticated Backpacks and Sophisticated Storage."
+  },
+  "promos": {
+    "1.21.1-latest": "1.0.0",
+    "1.21.1-recommended": "1.0.0"
+  }
+}

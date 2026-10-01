@@ -1,0 +1,80 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - "[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+  pull_request:
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover-targets:
+    name: Discover Minecraft targets
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.targets.outputs.matrix }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Read supported targets from the compatibility manifest
+        id: targets
+        run: echo "matrix=$(bash .github/scripts/discover-targets.sh)" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build for Minecraft ${{ matrix.minecraft_version }}
+    needs: discover-targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover-targets.outputs.matrix) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@v6
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: temurin
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build with Gradle
+        run: ./gradlew build -Pmc_version=${{ matrix.minecraft_version }}
+
+      - name: Compute artifact name
+        id: artifact
+        run: |
+          RAW="${{ github.head_ref || github.ref_name }}"
+          echo "name=${RAW//\//-}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mod-${{ matrix.minecraft_version }}-${{ steps.artifact.outputs.name }}-${{ github.sha }}
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
+            !build/libs/*-javadoc.jar
+          if-no-files-found: error
+          retention-days: 14

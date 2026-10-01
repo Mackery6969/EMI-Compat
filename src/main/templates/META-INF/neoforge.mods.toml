@@ -1,0 +1,72 @@
+modLoader="javafml" #mandatory
+
+# A version range to match for said mod loader - for regular FML @Mod it will be the FML version.
+loaderVersion="${loader_version_range}" #mandatory
+
+license="${mod_license}"
+
+issueTrackerURL="https://github.com/Mackery6969/EMI-Compat/issues" #optional
+
+[[mods]] #mandatory
+
+modId="${mod_id}" #mandatory
+
+version="${mod_version}" #mandatory
+
+displayName="${mod_name}" #mandatory
+
+# A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
+updateJSONURL="https://raw.githubusercontent.com/Mackery6969/EMI-Compat/main/updates.json" #optional
+
+displayURL="https://github.com/Mackery6969/EMI-Compat" #optional
+
+# A file name (in the root of the mod JAR) containing a logo for display
+logoFile="icon.png" #optional
+# The logo is pixel art, so disable the blur/linear filtering the mod list applies by default
+logoBlur=false #optional
+
+authors="Mackery"
+
+description='''
+Unofficial compatibility fixes between EMI and other mods. Each fix only applies when the mod it targets is
+installed, and can be turned off in the config. Client-side only.
+
+Sophisticated Backpacks & Storage: EMI's recipe tree highlights now show on storage slots holding items the tree
+still needs, and EMI's slot overlays are no longer drawn on slots scrolled out of view.
+'''
+
+# Client-only: servers do not need this mod, and clients with it can join servers without it.
+displayTest="IGNORE_ALL_VERSION"
+
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]] #optional
+    modId="neoforge" #mandatory
+    type="required" #mandatory
+    versionRange="${neo_version_range}" #mandatory
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="emi"
+    type="required"
+    versionRange="${emi_version_range}"
+    ordering="AFTER"
+    side="CLIENT"
+
+# Sophisticated Backpacks and Sophisticated Storage both build their screens on Sophisticated Core,
+# which is where that integration applies.
+[[dependencies.${mod_id}]]
+    modId="sophisticatedcore"
+    type="optional"
+    versionRange="${sophisticated_core_version_range}"
+    ordering="AFTER"
+    side="CLIENT"

@@ -1,0 +1,133 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Release type (also controls the GitHub prerelease flag)"
+        type: choice
+        options:
+          - release
+          - beta
+          - alpha
+        default: release
+      changelog:
+        description: "Changelog for this release (Markdown). Leave blank to pull the matching version's section from CHANGELOG.md automatically."
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  discover-targets:
+    name: Discover Minecraft targets
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.targets.outputs.matrix }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Read supported targets from the compatibility manifest
+        id: targets
+        run: echo "matrix=$(bash .github/scripts/discover-targets.sh)" >> "$GITHUB_OUTPUT"
+
+  release:
+    name: Build and publish for Minecraft ${{ matrix.minecraft_version }}
+    needs: discover-targets
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.discover-targets.outputs.matrix) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@v6
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: temurin
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build with Gradle
+        run: ./gradlew build -Pmc_version=${{ matrix.minecraft_version }}
+
+      - name: Read mod version
+        id: meta
+        run: |
+          MOD_ID=$(grep -oP '^mod_id=\K.*' gradle.properties)
+          MOD_VERSION=$(grep -oP '^mod_version=\K.*' gradle.properties)
+          MC_VERSION="${{ matrix.minecraft_version }}"
+          echo "mod_version=$MOD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=${MOD_VERSION}+${MC_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "name=${MOD_ID}-${MC_VERSION}-${MOD_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "github_name=${MOD_ID}-${MOD_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${MOD_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "file=build/libs/${MOD_ID}-${MC_VERSION}-${MOD_VERSION}.jar" >> "$GITHUB_OUTPUT"
+          {
+            echo "game_versions<<GAME_VERSIONS_EOF"
+            echo "${{ matrix.game_versions }}" | tr ',' '\n'
+            echo "GAME_VERSIONS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Extract this version's changelog section
+        id: changelog
+        run: |
+          MOD_VERSION="${{ steps.meta.outputs.mod_version }}"
+          {
+            echo "text<<CHANGELOG_EOF"
+            awk -v ver="$MOD_VERSION" '
+              /^## \[/ {
+                if (found) exit
+                if (index($0, "[" ver "]") > 0) { found=1; next }
+                next
+              }
+              found && /^\[[^]]+\]:/ { next }
+              found { print }
+            ' CHANGELOG.md
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish to GitHub Releases, CurseForge and Modrinth
+        uses: Kira-NT/mc-publish@v3
+        with:
+          name: ${{ steps.meta.outputs.name }}
+          version: ${{ steps.meta.outputs.version }}
+          version-type: ${{ inputs.release_type }}
+          files: ${{ steps.meta.outputs.file }}
+          loaders: neoforge
+          game-versions: ${{ steps.meta.outputs.game_versions }}
+          java: ${{ matrix.java_version }}
+
+          changelog: ${{ inputs.changelog != '' && inputs.changelog || steps.changelog.outputs.text }}
+
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-tag: ${{ steps.meta.outputs.tag }}
+          github-name: ${{ steps.meta.outputs.github_name }}
+
+          curseforge-id: 1721490
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          dependencies: |
+            emi(required){modrinth:fRiHVvU7}{curseforge:580555}
+            sophisticated-core(optional){modrinth:nmoqTijg}{curseforge:618298}
+            sophisticated-backpacks(optional){modrinth:TyCTlI4b}{curseforge:422301}
+            sophisticated-storage(optional){modrinth:hMlaZH8f}{curseforge:619320}

@@ -1,0 +1,149 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.146'
+    id 'idea'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+def manifest = new Properties()
+manifest.load(new StringReader(providers.fileContents(layout.projectDirectory.file('gradle/minecraft-versions.properties')).asText.get()))
+
+def manifestValue = { String key ->
+    def value = manifest.getProperty(key)?.trim()
+    if (!value) {
+        throw new GradleException("Missing required property '${key}' in gradle/minecraft-versions.properties")
+    }
+    return value
+}
+
+def supportedVersions = manifestValue('supported_versions').split(',')*.trim()
+def mcVersion = providers.gradleProperty('mc_version').getOrElse(manifestValue('default_version'))
+if (!supportedVersions.contains(mcVersion)) {
+    throw new GradleException("Minecraft ${mcVersion} is not a supported target. Supported: ${supportedVersions.join(', ')}")
+}
+def target = { String key -> manifestValue("version.${mcVersion}.${key}") }
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = "${mod_id}-${mcVersion}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(target('java_version') as int)
+
+sourceSets.main {
+    java.srcDir("src/compat/${target('source_family')}/java")
+    resources.srcDir("src/compat/${target('source_family')}/resources")
+}
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter {
+            includeGroup 'maven.modrinth'
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'TerraformersMC'
+                url = 'https://maven.terraformersmc.com/releases/'
+            }
+        }
+        filter {
+            includeGroup 'dev.emi'
+        }
+    }
+}
+
+neoForge {
+    version = target('neoforge')
+
+    parchment {
+        mappingsVersion = target('parchment_mappings')
+        minecraftVersion = target('parchment_minecraft')
+    }
+
+    runs {
+        client {
+            client()
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    compileOnly "dev.emi:emi-neoforge:${target('emi')}"
+    localRuntime "dev.emi:emi-neoforge:${target('emi')}"
+
+    compileOnly "maven.modrinth:sophisticated-core:${target('sophisticated_core')}"
+    localRuntime "maven.modrinth:sophisticated-core:${target('sophisticated_core')}"
+    localRuntime "maven.modrinth:sophisticated-backpacks:${target('sophisticated_backpacks')}"
+    localRuntime "maven.modrinth:sophisticated-storage:${target('sophisticated_storage')}"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version_range         : target('minecraft_range'),
+            neo_version_range               : target('neoforge_range'),
+            loader_version_range            : loader_version_range,
+            emi_version_range               : target('emi_range'),
+            sophisticated_core_version_range: target('sophisticated_core_range'),
+            mod_id                          : mod_id,
+            mod_name                        : mod_name,
+            mod_license                     : mod_license,
+            mod_version                     : mod_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+def licenseSuffix = "_${mod_id}"
+tasks.named('jar', Jar).configure {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}${licenseSuffix}" }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
