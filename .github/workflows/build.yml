@@ -60,6 +60,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Build with Gradle
         run: ./gradlew build -Pmc_version=${{ matrix.minecraft_version }}
 
@@ -68,7 +71,6 @@ jobs:
         with:
           path: build/libs
           upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-          # One category per target, so each Minecraft version's results don't replace the others'.
           category: build-${{ matrix.minecraft_version }}
 
       - name: Compute artifact name
