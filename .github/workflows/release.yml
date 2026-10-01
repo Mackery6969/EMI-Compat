@@ -1,6 +1,11 @@
 name: Release
 
 on:
+  # Pushing a tag like v1.0.0 releases that version as a full release, with the changelog from CHANGELOG.md.
+  push:
+    tags:
+      - "v*"
+
   workflow_dispatch:
     inputs:
       release_type:
@@ -36,6 +41,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+
+      - name: Check the tag matches mod_version
+        if: github.ref_type == 'tag'
+        run: |
+          MOD_VERSION=$(grep -oP '^mod_version=\K.*' gradle.properties)
+          if [ "$GITHUB_REF_NAME" != "v${MOD_VERSION}" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match mod_version=${MOD_VERSION} in gradle.properties (expected v${MOD_VERSION})."
+            exit 1
+          fi
 
       - name: Read supported targets from the compatibility manifest
         id: targets
@@ -119,13 +133,13 @@ jobs:
         with:
           name: ${{ steps.meta.outputs.name }}
           version: ${{ steps.meta.outputs.version }}
-          version-type: ${{ inputs.release_type }}
+          version-type: ${{ inputs.release_type || 'release' }}
           files: ${{ steps.meta.outputs.file }}
           loaders: neoforge
           game-versions: ${{ steps.meta.outputs.game_versions }}
           java: ${{ matrix.java_version }}
 
-          changelog: ${{ inputs.changelog != '' && inputs.changelog || steps.changelog.outputs.text }}
+          changelog: ${{ inputs.changelog || steps.changelog.outputs.text }}
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-tag: ${{ steps.meta.outputs.tag }}
