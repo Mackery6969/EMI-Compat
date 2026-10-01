@@ -13,6 +13,8 @@ on:
 
 permissions:
   contents: read
+  security-events: write
+  actions: read
 
 concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -60,6 +62,14 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build -Pmc_version=${{ matrix.minecraft_version }}
+
+      - name: Scan jar for malware
+        uses: Mackery6969/Minecraft-Malware-Scanner@v1
+        with:
+          path: build/libs
+          upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+          # One category per target, so each Minecraft version's results don't replace the others'.
+          category: build-${{ matrix.minecraft_version }}
 
       - name: Compute artifact name
         id: artifact

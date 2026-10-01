@@ -19,6 +19,8 @@ on:
 
 permissions:
   contents: write
+  security-events: write
+  actions: read
 
 concurrency:
   group: release-${{ github.workflow }}
@@ -66,6 +68,12 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build -Pmc_version=${{ matrix.minecraft_version }}
+
+      - name: Scan jar for malware
+        uses: Mackery6969/Minecraft-Malware-Scanner@v1
+        with:
+          path: build/libs
+          category: release-${{ matrix.minecraft_version }}
 
       - name: Read mod version
         id: meta
@@ -123,7 +131,7 @@ jobs:
           curseforge-id: 1721490
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
-          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-id: 9T2UKuzl
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           dependencies: |
