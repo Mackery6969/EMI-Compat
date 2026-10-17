@@ -29,3 +29,6 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # Provided by Minecraft/NeoForge at runtime; this mod neither ships nor pins it.
+      - dependency-name: "org.lz4:lz4-java"
