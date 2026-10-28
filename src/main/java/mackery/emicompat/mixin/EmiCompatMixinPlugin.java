@@ -36,13 +36,14 @@ public class EmiCompatMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         for (Map.Entry<String, String> integration : INTEGRATION_MODS.entrySet()) {
-            if (mixinClassName.startsWith(integration.getKey())) {
-                boolean present = LoadingModList.get().getModFileById(integration.getValue()) != null;
-                if (!present) {
-                    LOGGER.info("Skipping {} - {} is not installed", mixinClassName, integration.getValue());
-                }
-                return present;
+            if (!mixinClassName.startsWith(integration.getKey())) {
+                continue;
             }
+            boolean present = LoadingModList.get().getModFileById(integration.getValue()) != null;
+            if (!present) {
+                LOGGER.info("Skipping {} - {} is not installed", mixinClassName, integration.getValue());
+            }
+            return present;
         }
         return true;
     }
