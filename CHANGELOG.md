@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - 2026-11-06
+
+### Added
+
+- Added support for [Traveller's Backpack](https://www.curseforge.com/minecraft/mc-mods/travelers-backpack), allowing EMI to highlight slots in the backpack that contain items needed for the recipe tree. ([#9](https://github.com/Mackery6969/EMI-Compat/issues/9))
+
 ## [1.0.1] - 2026-10-15
 
 ### Fixed
