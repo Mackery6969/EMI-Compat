@@ -33,6 +33,8 @@ installed, and can be turned off in the config. Client-side only.
 
 Sophisticated Backpacks & Storage: EMI's recipe tree highlights now show on storage slots holding items the tree
 still needs, and EMI's slot overlays are no longer drawn on slots scrolled out of view.
+
+Traveler's Backpack: EMI's recipe tree highlights now show on backpack slots holding items the tree still needs.
 '''
 
 # Client-only: servers do not need this mod, and clients with it can join servers without it.
@@ -68,5 +70,12 @@ config="${mod_id}.mixins.json"
     modId="sophisticatedcore"
     type="optional"
     versionRange="${sophisticated_core_version_range}"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="travelersbackpack"
+    type="optional"
+    versionRange="${travelers_backpack_version_range}"
     ordering="AFTER"
     side="CLIENT"

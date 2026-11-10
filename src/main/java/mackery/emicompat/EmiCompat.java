@@ -13,6 +13,8 @@ public class EmiCompat {
 
     public static final String SOPHISTICATEDCORE_MODID = "sophisticatedcore";
 
+    public static final String TRAVELERSBACKPACK_MODID = "travelersbackpack";
+
     public EmiCompat(ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.CLIENT, Config.SPEC);
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
