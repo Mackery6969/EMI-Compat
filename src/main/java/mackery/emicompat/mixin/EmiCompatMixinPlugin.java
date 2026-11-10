@@ -22,7 +22,8 @@ public class EmiCompatMixinPlugin implements IMixinConfigPlugin {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Map<String, String> INTEGRATION_MODS = Map.of(
-            "mackery.emicompat.mixin.sophisticated.", EmiCompat.SOPHISTICATEDCORE_MODID);
+            "mackery.emicompat.mixin.sophisticated.", EmiCompat.SOPHISTICATEDCORE_MODID,
+            "mackery.emicompat.mixin.travelersbackpack.", EmiCompat.TRAVELERSBACKPACK_MODID);
 
     @Override
     public void onLoad(String mixinPackage) {

@@ -108,6 +108,9 @@ dependencies {
     localRuntime "maven.modrinth:sophisticated-core:${target('sophisticated_core')}"
     localRuntime "maven.modrinth:sophisticated-backpacks:${target('sophisticated_backpacks')}"
     localRuntime "maven.modrinth:sophisticated-storage:${target('sophisticated_storage')}"
+
+    compileOnly "maven.modrinth:travelersbackpack:${target('travelers_backpack')}"
+    localRuntime "maven.modrinth:travelersbackpack:${target('travelers_backpack')}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -117,6 +120,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             loader_version_range            : loader_version_range,
             emi_version_range               : target('emi_range'),
             sophisticated_core_version_range: target('sophisticated_core_range'),
+            travelers_backpack_version_range: target('travelers_backpack_range'),
             mod_id                          : mod_id,
             mod_name                        : mod_name,
             mod_license                     : mod_license,

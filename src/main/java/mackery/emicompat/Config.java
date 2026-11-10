@@ -29,6 +29,21 @@ public class Config {
             .translation("emicompat.configuration.sophisticated.skipHiddenSlots")
             .define("skipHiddenSlots", true);
 
+    // --- Traveler's Backpack ---
+
+    public static final ModConfigSpec.BooleanValue TRAVELERS_BACKPACK_HIGHLIGHT_BACKPACK_SLOTS = BUILDER
+            .pop()
+            .comment("Traveler's Backpack. Only used when Traveler's Backpack is installed.")
+            .translation("emicompat.configuration.travelersbackpack")
+            .push("travelersbackpack")
+            .comment(
+                    "With an EMI recipe tree in crafting mode, highlight Traveler's Backpack slots that hold items the",
+                    "tree still needs, the same way EMI does for a vanilla chest. Backpacks with a Crafting Upgrade are",
+                    "left alone, since EMI can craft from their contents and counts them as available.",
+                    "Default: true")
+            .translation("emicompat.configuration.travelersbackpack.highlightBackpackSlots")
+            .define("highlightBackpackSlots", true);
+
     static {
         BUILDER.pop();
     }

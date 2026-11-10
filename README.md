@@ -25,11 +25,24 @@ can see what to grab from a chest. That highlight never showed up in
 
 Needs Sophisticated Core 1.4.16 or newer. The fix lives in Sophisticated Core, so it covers Backpacks, Storage, or both.
 
+### Traveler's Backpack
+
+The same recipe tree highlight never showed up in [Traveler's Backpack](https://modrinth.com/mod/travelersbackpack)
+screens either.
+
+- **Recipe tree highlights in backpacks.** Traveler's Backpack's EMI handler reports every backpack slot as an
+  ingredient source, so EMI counted the backpack's contents as "have" and skipped those slots, even though it can only
+  craft from the backpack with a Crafting Upgrade installed. Without one, backpack items no longer count toward the tree
+  and are highlighted, just like in a vanilla chest. With a Crafting Upgrade installed, EMI's fill button pulls from the
+  backpack, so its contents still count and those slots are left alone.
+
+Needs Traveler's Backpack 10.1.17 or newer. Works whether the backpack is worn, held or placed.
+
 ## Compatibility
 
-| Minecraft | Loader   | EMI    | Optional integrations      |
-|-----------|----------|--------|----------------------------|
-| 1.21.1    | NeoForge | 1.1.0+ | Sophisticated Core 1.4.16+ |
+| Minecraft | Loader   | EMI    | Optional integrations                                   |
+|-----------|----------|--------|---------------------------------------------------------|
+| 1.21.1    | NeoForge | 1.1.0+ | Sophisticated Core 1.4.16+, Traveler's Backpack 10.1.17+ |
 
 EMI's newest release is for 1.21.1, so that is the only target for now. Newer Minecraft versions can be added once EMI
 supports them (see below).

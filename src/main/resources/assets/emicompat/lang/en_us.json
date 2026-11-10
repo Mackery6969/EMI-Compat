@@ -7,5 +7,9 @@
   "emicompat.configuration.sophisticated.highlightStorageSlots": "Highlight Storage Slots",
   "emicompat.configuration.sophisticated.highlightStorageSlots.tooltip": "Highlight backpack and storage slots holding items an EMI recipe tree still needs.",
   "emicompat.configuration.sophisticated.skipHiddenSlots": "Skip Hidden Slots",
-  "emicompat.configuration.sophisticated.skipHiddenSlots.tooltip": "Don't draw EMI slot overlays on storage slots that are scrolled out of view or hidden by the search box."
+  "emicompat.configuration.sophisticated.skipHiddenSlots.tooltip": "Don't draw EMI slot overlays on storage slots that are scrolled out of view or hidden by the search box.",
+  "emicompat.configuration.travelersbackpack": "Traveler's Backpack",
+  "emicompat.configuration.travelersbackpack.tooltip": "Only used when Traveler's Backpack is installed.",
+  "emicompat.configuration.travelersbackpack.highlightBackpackSlots": "Highlight Backpack Slots",
+  "emicompat.configuration.travelersbackpack.highlightBackpackSlots.tooltip": "Highlight backpack slots holding items an EMI recipe tree still needs."
 }
